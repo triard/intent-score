@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView homeLogo, awayLogo;
     private EditText homeTeam, awayTeam;
     private Uri homeUri, awayUri;
+    private Bitmap homeBitmap, awayBitmap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,8 +61,8 @@ public class MainActivity extends AppCompatActivity {
                 if (data != null){
                     try {
                         homeUri = data.getData();
-                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), homeUri);
-                        homeLogo.setImageBitmap(bitmap);
+                        homeBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), homeUri);
+                        homeLogo.setImageBitmap(homeBitmap);
                     }catch (IOException e){
                         Toast.makeText(this, "Can't load image", Toast.LENGTH_SHORT).show();
                         Log.e(TAG, e.getMessage());
@@ -71,8 +72,8 @@ public class MainActivity extends AppCompatActivity {
                 if (data != null){
                     try {
                         awayUri = data.getData();
-                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), awayUri);
-                        awayLogo.setImageBitmap(bitmap);
+                        awayBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), awayUri);
+                        awayLogo.setImageBitmap(awayBitmap);
                     }catch (IOException e){
                         Toast.makeText(this, "Can't load image", Toast.LENGTH_SHORT).show();
                         Log.e(TAG, e.getMessage());
@@ -98,22 +99,33 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void handleSubmitTeam(View view) {
+
+
         String homeTeamName = homeTeam.getText().toString();
         String awayTeamName = awayTeam.getText().toString();
-        String homeUriString = homeUri.toString();
-        String awayUriString = awayUri.toString();
 
-        boolean validate = !homeTeamName.isEmpty() && !awayTeamName.isEmpty() && !homeUriString.isEmpty() && !awayUriString.isEmpty();
+        boolean validate = homeTeamName.isEmpty()&&awayTeamName.isEmpty();
 
-        if (validate){
+        if(homeTeamName.isEmpty()){
+            Toast.makeText(this, "Entry home Team name!", Toast.LENGTH_SHORT).show();
+        }else if(awayTeamName.isEmpty()){
+            Toast.makeText(this, "Entry away Team name!", Toast.LENGTH_SHORT).show();
+        }else if (homeBitmap==null){
+            Toast.makeText(this, "Attach Home Team logo!", Toast.LENGTH_SHORT).show();
+        }else if (awayBitmap==null){
+        Toast.makeText(this, "Attach Away Team logo!", Toast.LENGTH_SHORT).show();
+    }
+        else if(validate){
+            Toast.makeText(this, "Fill all Team name!", Toast.LENGTH_SHORT).show();
+        }
+        else {
+
             Intent i = new Intent(MainActivity.this, MatchActivity.class);
             i.putExtra("homeTeam", homeTeamName);
             i.putExtra("awayTeam", awayTeamName);
-            i.putExtra("homeUri", homeUriString);
-            i.putExtra("awayUri", awayUriString);
+            i.putExtra("homeUri", homeUri.toString());
+            i.putExtra("awayUri", awayUri.toString());
             startActivity(i);
-        }else {
-            Toast.makeText(this, "Fill all Team name!", Toast.LENGTH_SHORT).show();
         }
     }
 }
